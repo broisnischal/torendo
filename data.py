@@ -67,13 +67,25 @@ def fetch_ohlcv(symbol, resolution="1D", start=None, end=None, currency="NPR"):
 
 def compute_metrics(close, periods_per_year=252):
     """Return total return / CAGR / annualized vol / naive Sharpe / max drawdown for a close-price series."""
+    empty = {
+        "total_return_pct": np.nan,
+        "cagr_pct": np.nan,
+        "ann_volatility_pct": np.nan,
+        "sharpe_naive": np.nan,
+        "max_drawdown_pct": np.nan,
+    }
+    if len(close) < 2:
+        return empty
+
     ret = close.pct_change().dropna()
     cum = (1 + ret).cumprod()
+    if not len(cum):
+        return empty
     drawdown = cum / cum.cummax() - 1
 
-    total_return = cum.iloc[-1] - 1 if len(cum) else np.nan
+    total_return = cum.iloc[-1] - 1
     years = (close.index[-1] - close.index[0]).days / 365.25
-    cagr = (cum.iloc[-1]) ** (1 / years) - 1 if years > 0 and len(cum) else np.nan
+    cagr = (cum.iloc[-1]) ** (1 / years) - 1 if years > 0 else np.nan
     vol_annual = ret.std() * np.sqrt(periods_per_year)
     sharpe = (ret.mean() * periods_per_year) / vol_annual if vol_annual else np.nan
 
@@ -82,7 +94,7 @@ def compute_metrics(close, periods_per_year=252):
         "cagr_pct": cagr * 100,
         "ann_volatility_pct": vol_annual * 100,
         "sharpe_naive": sharpe,
-        "max_drawdown_pct": drawdown.min() * 100 if len(drawdown) else np.nan,
+        "max_drawdown_pct": drawdown.min() * 100,
     }
 
 

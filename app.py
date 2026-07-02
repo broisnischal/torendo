@@ -450,11 +450,15 @@ with tab_portfolio:
     st.query_params["weights"] = ",".join(f"{sym}:{w}" for sym, w in raw_weights.items())
 
     total_w = sum(raw_weights.values())
+    # Forward-fill before computing returns: NEPSE stocks don't all trade the same days, and
+    # dropping any row with a gap (the old behavior) could collapse illiquid combinations to 0 rows.
+    aligned_rets = close_df.ffill().dropna().pct_change().dropna()
     if total_w <= 0:
         st.warning("At least one weight must be greater than 0.")
+    elif aligned_rets.empty:
+        st.warning("These stocks don't have enough overlapping trading history to combine into a portfolio yet.")
     else:
         weights = {sym: w / total_w for sym, w in raw_weights.items()}
-        aligned_rets = close_df.pct_change().dropna()
         port_ret = (aligned_rets * pd.Series(weights)).sum(axis=1)
         port_cum = (1 + port_ret).cumprod()
 
