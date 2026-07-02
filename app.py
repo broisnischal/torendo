@@ -91,9 +91,8 @@ st.markdown(
 
 st.title("Torendo")
 st.caption(
-    "NEPSE market analyzer — price history via merolagani's public chart endpoint. This is an "
-    "unofficial data source: treat it as directionally useful, not a source of truth for real "
-    "trading decisions."
+    "NEPSE market analyzer. Data comes from unofficial public sources — treat it as "
+    "directionally useful, not a source of truth for real trading decisions."
 )
 
 

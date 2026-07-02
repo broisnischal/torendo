@@ -1,31 +1,17 @@
 # Torendo
 
-NEPSE market analyzer (Streamlit). Pulls price history via merolagani's public
-chart endpoint, with:
+NEPSE market analyzer built with Streamlit.
 
-- searchable picker over the full NEPSE symbol list (~300 tickers with company names)
-- candlestick charts with SMA/EMA/Bollinger/RSI/MACD, scroll-zoom, range presets,
-  and on-chart drawing tools (trendline/freehand/rectangle)
-- return/risk metrics, correlation heatmap, weighted portfolio combining
-- liquidity tab: volume profile by price level, rolling turnover, thin-stock stats
-- SMA-crossover backtesting
-- AI chat (Mistral) grounded in the data computed for your selected stocks
+## Features
 
-While NEPSE is open (Sun–Thu, 11:00–15:00 Nepal time) and the selected date
-range includes today, the app auto-refreshes every 30s (toggleable). Outside
-those hours it shows the last available cached data — no point polling a
-closed market.
-
-An older `analysis.ipynb` notebook covering the same core analysis also lives
-in this repo for quick one-off scripting.
-
-## Data source caveats
-
-`merolagani.com`'s chart endpoint is unofficial and undocumented — there's no
-ToS guarantee it keeps working. Every free NEPSE data source we found (official
-site, Sharesansar, NepseAlpha) is similarly unofficial; none offer genuine
-push/WebSocket live data, only pollable endpoints. If this endpoint ever breaks,
-`data.py`'s `fetch_ohlcv` is the single place to swap in a replacement.
+- Searchable picker over the full NEPSE symbol list
+- Candlestick charts with SMA/EMA/Bollinger/RSI/MACD, scroll-zoom, range presets, and on-chart drawing tools
+- Return/risk metrics, correlation heatmap, and weighted portfolio analysis
+- Liquidity view: volume profile by price level, rolling turnover, thin-stock stats
+- Moving-average crossover backtesting
+- AI chat (sidebar) grounded in the data computed for your selected stocks
+- Live auto-refresh during market hours (Sun–Thu, 11:00–15:00 NPT), toggleable
+- Shareable views — stocks, dates, and weights are encoded in the page URL
 
 ## Run locally
 
@@ -34,41 +20,19 @@ uv sync
 uv run streamlit run app.py
 ```
 
-## AI chat setup
+The AI chat needs a Mistral API key in `.streamlit/secrets.toml` (gitignored):
 
-The AI Chat tab needs a Mistral API key (get one at https://console.mistral.ai).
-It reads from Streamlit's secrets mechanism, which is **not** the same as GitHub
-repo secrets — a GitHub Actions secret on this repo is not visible to the running
-app at all.
-
-**Local dev**: create `.streamlit/secrets.toml` (already gitignored — never commit
-this file) with:
 ```toml
 MISTRAL_API_KEY = "your-key-here"
 ```
 
-**Streamlit Community Cloud**: open the deployed app → bottom-right "Manage app"
-→ Settings → Secrets, and paste the same `MISTRAL_API_KEY = "..."` line there.
-This is the only way to get the key into the running Cloud app — there's no CLI
-for it, and GitHub secrets don't reach it.
+## Deploy
 
-## Saving / sharing a view
+Deploys as a standard Streamlit app (dependencies in `requirements.txt`).
+On Streamlit Community Cloud, set `MISTRAL_API_KEY` under the app's
+Settings → Secrets.
 
-There's no login — your chosen stocks, date range, resolution, and portfolio
-weights are all encoded in the page URL as you change them. Bookmark or copy
-the browser address bar to save or share an exact setup; opening that URL
-restores it.
+## Disclaimer
 
-## Deploy to Streamlit Community Cloud
-
-1. Push this repo to GitHub (public, or private if linked to your Streamlit account):
-   ```
-   git remote add origin <your-github-repo-url>
-   git branch -M main
-   git push -u origin main
-   ```
-2. Go to https://share.streamlit.io, sign in with GitHub, and click "New app".
-3. Pick this repo/branch, set the main file path to `app.py`, and deploy.
-4. Streamlit Cloud installs from `requirements.txt` automatically — no extra config needed.
-
-Each subsequent `git push` to the connected branch auto-redeploys the app.
+Market data comes from unofficial public sources and may be delayed,
+incomplete, or break without notice. Nothing here is financial advice.
