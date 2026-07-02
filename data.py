@@ -1,4 +1,3 @@
-"""Data fetching and analysis helpers for NEPSE stocks via merolagani's chart API."""
 
 import re
 import time
