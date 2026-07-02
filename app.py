@@ -1,4 +1,3 @@
-"""Torendo — NEPSE market analyzer on top of merolagani's chart API."""
 
 import os
 from concurrent.futures import ThreadPoolExecutor
