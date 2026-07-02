@@ -60,7 +60,34 @@ def get_mistral_api_key():
     return key or os.environ.get("MISTRAL_API_KEY")
 
 
-st.set_page_config(page_title="Torendo", layout="wide", initial_sidebar_state="expanded")
+# "auto" = expanded on desktop, collapsed on phones (where the sidebar would cover the page).
+st.set_page_config(page_title="Torendo", layout="wide", initial_sidebar_state="auto")
+
+# Mobile responsiveness: Streamlit keeps columns side-by-side on small screens,
+# which crushes metric tiles and input rows — stack them instead, and trim padding.
+st.markdown(
+    """
+    <style>
+    @media (max-width: 640px) {
+        div[data-testid="stColumn"],
+        div[data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+        .block-container {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+            padding-top: 2.5rem !important;
+        }
+        h1 { font-size: 1.6rem !important; }
+        div[data-testid="stMetric"] { padding: 0.25rem 0 !important; }
+        button[data-testid="stTab"] { font-size: 0.85rem !important; padding: 0.4rem 0.6rem !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.title("Torendo")
 st.caption(
