@@ -1,5 +1,6 @@
 """Data fetching and analysis helpers for NEPSE stocks via merolagani's chart API."""
 
+import re
 import time
 from datetime import datetime, time as dtime
 from zoneinfo import ZoneInfo
@@ -9,6 +10,7 @@ import pandas as pd
 import requests
 
 BASE_URL = "https://merolagani.com/handlers/TechnicalChartHandler.ashx"
+MARKET_PAGE_URL = "https://merolagani.com/LatestMarket.aspx"
 
 NEPAL_TZ = ZoneInfo("Asia/Kathmandu")
 MARKET_OPEN = dtime(11, 0)
@@ -63,6 +65,38 @@ def fetch_ohlcv(symbol, resolution="1D", start=None, end=None, currency="NPR"):
     ).set_index("date").sort_index()
     df = df[~df.index.duplicated(keep="last")]
     return df
+
+
+def fetch_symbol_list():
+    """Scrape the full NEPSE symbol list (symbol -> company name) from merolagani's market page.
+
+    Returns a dict like {"NABIL": "Nabil Bank Limited", ...}. Raises on network failure.
+    """
+    resp = requests.get(MARKET_PAGE_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+    resp.raise_for_status()
+    pattern = re.compile(
+        r"CompanyDetail\.aspx\?symbol=([A-Z0-9]+)'\s+title='[A-Z0-9]+\s+\(([^)]+)\)'"
+    )
+    symbols = {}
+    for sym, name in pattern.findall(resp.text):
+        symbols[sym] = name.strip()
+    if not symbols:
+        raise ValueError("no symbols parsed from market page (page layout may have changed)")
+    return dict(sorted(symbols.items()))
+
+
+def liquidity_stats(df):
+    """Liquidity snapshot for one symbol's OHLCV frame: turnover, volume, dead days."""
+    turnover = df["close"] * df["volume"]
+    recent = df.tail(20)
+    return {
+        "avg_daily_turnover_npr": turnover.mean(),
+        "recent_avg_turnover_npr": (recent["close"] * recent["volume"]).mean(),
+        "median_daily_volume": df["volume"].median(),
+        "zero_volume_days_pct": (df["volume"] <= 0).mean() * 100,
+        "high_52w": df["high"].tail(252).max(),
+        "low_52w": df["low"].tail(252).min(),
+    }
 
 
 def compute_metrics(close, periods_per_year=252):

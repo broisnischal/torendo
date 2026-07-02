@@ -1,14 +1,20 @@
-# NEPSE Portfolio Analyzer
+# Torendo
 
-Interactive Streamlit app for pulling NEPSE stock price history (via merolagani's
-public chart endpoint), charting candlesticks with SMA/EMA/Bollinger/RSI/MACD,
-analyzing return/risk/correlation, combining stocks into a weighted portfolio,
-backtesting a simple moving-average crossover, and an AI chat tab (Mistral) that
-answers questions grounded in the data already computed for your selected stocks.
+NEPSE market analyzer (Streamlit). Pulls price history via merolagani's public
+chart endpoint, with:
+
+- searchable picker over the full NEPSE symbol list (~300 tickers with company names)
+- candlestick charts with SMA/EMA/Bollinger/RSI/MACD, scroll-zoom, range presets,
+  and on-chart drawing tools (trendline/freehand/rectangle)
+- return/risk metrics, correlation heatmap, weighted portfolio combining
+- liquidity tab: volume profile by price level, rolling turnover, thin-stock stats
+- SMA-crossover backtesting
+- AI chat (Mistral) grounded in the data computed for your selected stocks
 
 While NEPSE is open (Sun–Thu, 11:00–15:00 Nepal time) and the selected date
-range includes today, the app auto-refreshes every 30s. Outside those hours
-it just shows the last available cached data — no point polling a closed market.
+range includes today, the app auto-refreshes every 30s (toggleable). Outside
+those hours it shows the last available cached data — no point polling a
+closed market.
 
 An older `analysis.ipynb` notebook covering the same core analysis also lives
 in this repo for quick one-off scripting.
