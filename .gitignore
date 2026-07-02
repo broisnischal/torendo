@@ -12,3 +12,6 @@ wheels/
 # Jupyter
 .ipynb_checkpoints/
 
+# Local secrets (Streamlit Cloud secrets are configured in its own dashboard, not this file)
+.streamlit/secrets.toml
+

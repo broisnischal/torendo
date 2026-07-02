@@ -4,3 +4,4 @@ numpy==2.5.0
 plotly==6.8.0
 requests==2.34.2
 streamlit-autorefresh==1.0.1
+mistralai==2.5.1

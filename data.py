@@ -172,6 +172,28 @@ def macd(series, fast=12, slow=26, signal=9):
     return macd_line, signal_line, histogram
 
 
+def summarize_indicators(close):
+    """Plain-text snapshot of RSI/SMA-trend/MACD state, for feeding to the AI chat as context."""
+    if len(close) < 20:
+        return "insufficient history for indicators"
+
+    parts = [f"RSI(14)={rsi(close).iloc[-1]:.1f}"]
+
+    if len(close) >= 50:
+        sma20, sma50 = sma(close, 20).iloc[-1], sma(close, 50).iloc[-1]
+        trend = "above" if sma20 > sma50 else "below"
+        parts.append(f"SMA20 {trend} SMA50 ({sma20:.2f} vs {sma50:.2f})")
+
+    _, _, hist = macd(close)
+    hist_valid = hist.dropna()
+    if len(hist_valid):
+        latest_hist = hist_valid.iloc[-1]
+        sign = "positive" if latest_hist >= 0 else "negative"
+        parts.append(f"MACD histogram {sign} ({latest_hist:.3f})")
+
+    return ", ".join(parts)
+
+
 def interpret_correlation(corr):
     if corr > 0.7:
         return "move together strongly — holding both adds little diversification"

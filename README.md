@@ -3,7 +3,8 @@
 Interactive Streamlit app for pulling NEPSE stock price history (via merolagani's
 public chart endpoint), charting candlesticks with SMA/EMA/Bollinger/RSI/MACD,
 analyzing return/risk/correlation, combining stocks into a weighted portfolio,
-and backtesting a simple moving-average crossover.
+backtesting a simple moving-average crossover, and an AI chat tab (Mistral) that
+answers questions grounded in the data already computed for your selected stocks.
 
 While NEPSE is open (Sun–Thu, 11:00–15:00 Nepal time) and the selected date
 range includes today, the app auto-refreshes every 30s. Outside those hours
@@ -26,6 +27,24 @@ push/WebSocket live data, only pollable endpoints. If this endpoint ever breaks,
 uv sync
 uv run streamlit run app.py
 ```
+
+## AI chat setup
+
+The AI Chat tab needs a Mistral API key (get one at https://console.mistral.ai).
+It reads from Streamlit's secrets mechanism, which is **not** the same as GitHub
+repo secrets — a GitHub Actions secret on this repo is not visible to the running
+app at all.
+
+**Local dev**: create `.streamlit/secrets.toml` (already gitignored — never commit
+this file) with:
+```toml
+MISTRAL_API_KEY = "your-key-here"
+```
+
+**Streamlit Community Cloud**: open the deployed app → bottom-right "Manage app"
+→ Settings → Secrets, and paste the same `MISTRAL_API_KEY = "..."` line there.
+This is the only way to get the key into the running Cloud app — there's no CLI
+for it, and GitHub secrets don't reach it.
 
 ## Saving / sharing a view
 
